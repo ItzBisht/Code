@@ -1,4 +1,4 @@
-create or replace procedure employee_validate_json(INPUT VARCHAR)
+create or replace procedure DEMO_DB.DEMO.employee_validate_json(INPUT VARCHAR)
 RETURNS VARIANT NOT NULL
 LANGUAGE JAVASCRIPT
 AS
