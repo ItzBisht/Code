@@ -15,19 +15,36 @@ jobs:
 
       - name: Deploy to Snowflake
         env:
-          SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SF_USERNAME }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
-          SNOWFLAKE_DATABASE: ${{ secrets.SF_DATABASE }}
-          SNOWFLAKE_SCHEMA: ${{ secrets.SF_SCHEMA }}
+          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SF_USER: ${{ secrets.SF_USER }}
+          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
+          SF_DATABASE: ${{ secrets.SF_DATABASE }}
+          SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
         run: |
-          snowflake_command() {
-            sql_command="$1"
-            snowsql_command="snowsql -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -p $SNOWFLAKE_PASSWORD -d $SNOWFLAKE_DATABASE -s $SNOWFLAKE_SCHEMA -q \"\$sql_command\""
-            eval $snowsql_command
+          sql_command() {
+            endpoint="https://rzlatkv-rf44335.snowflakecomputing.com"
+            request_data='{
+              "sqlText": "'"$(cat "$1")"'"
+            }'
+            curl --request POST \
+              --url $endpoint'/v1/queries' \
+              --header 'Content-Type: application/json' \
+              --header 'Authorization: Bearer '$(sf_token) \
+              --data-raw "$request_data"
           }
+
+          sf_token=$(curl --request POST \
+            --url 'https://https://rzlatkv-rf44335.snowflakecomputing.com/v1/session/authenticator-request' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+              "data": {
+                "AUTHENTICATOR": "SNOWFLAKE",
+                "LOGIN_NAME": "'"${SF_USER}"'",
+                "PASSWORD": "'"${SF_PASSWORD}"'"
+              }
+            }' | jq -r '.data.token')
 
           find ./dbscripts -name '*.sql' -print0 | sort -z | while IFS= read -r -d '' file; do
             echo "Executing SQL file: $file"
-            snowflake_command "$(cat "$file")"
+            sql_command "$file"
           done
