@@ -32,4 +32,4 @@ jobs:
           SNOWFLAKE_USER: ${{ secrets.SF_USER }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         run: |
-          find ./dbscripts -name '*.sql' -print0 | sort -z | xargs -0 cat | ./snowflake-snowsql-1.2.27-1.x86_64/snowsql
+          find ./dbscripts -name '*.sql' -print0 | sort -z | xargs -0 cat | ./usr/lib64/snowflake/snowsql
