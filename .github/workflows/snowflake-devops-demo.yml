@@ -13,38 +13,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Set up SnowSQL
+        run: |
+          curl -O curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowflake-snowsql-1.2.27-1.x86_64.rpm
+          sudo rpm -ivh snowflake-snowsql-1.2.27-1.x86_64.rpm
+
+      - name: Set up Snowflake Config
+        run: |
+          mkdir ~/.snowsql
+          echo "[connections]" >> ~/.snowsql/config
+          echo "accountname = ${SNOWFLAKE_ACCOUNT}" >> ~/.snowsql/config
+          echo "username = ${SNOWFLAKE_USER}" >> ~/.snowsql/config
+          echo "password = ${SNOWFLAKE_PASSWORD}" >> ~/.snowsql/config
+
       - name: Deploy to Snowflake
         env:
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USER: ${{ secrets.SF_USER }}
-          SF_PASSWORD: ${{ secrets.SF_PASSWORD }}
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}
-          SF_SCHEMA: ${{ secrets.SF_SCHEMA }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SF_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
         run: |
-          sql_command() {
-            endpoint="https://rzlatkv-rf44335.snowflakecomputing.com"
-            request_data='{
-              "sqlText": "'"$(cat "$1")"'"
-            }'
-            curl --request POST \
-              --url $endpoint'/v1/queries' \
-              --header 'Content-Type: application/json' \
-              --header 'Authorization: Bearer '$(sf_token) \
-              --data-raw "$request_data"
-          }
-
-          sf_token=$(curl --request POST \
-            --url 'https://https://rzlatkv-rf44335.snowflakecomputing.com/v1/session/authenticator-request' \
-            --header 'Content-Type: application/json' \
-            --data-raw '{
-              "data": {
-                "AUTHENTICATOR": "SNOWFLAKE",
-                "LOGIN_NAME": "'"${SF_USER}"'",
-                "PASSWORD": "'"${SF_PASSWORD}"'"
-              }
-            }' | jq -r '.data.token')
-
-          find ./dbscripts -name '*.sql' -print0 | sort -z | while IFS= read -r -d '' file; do
-            echo "Executing SQL file: $file"
-            sql_command "$file"
-          done
+          find ./dbscripts -name '*.sql' -print0 | sort -z | xargs -0 cat | ./snowflake-snowsql-1.2.27-1.x86_64/snowsql
