@@ -15,9 +15,9 @@ jobs:
 
       - name: Set up SnowSQL
         run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/2.10/linux_x86_64/snowsql-2.10.1-linux_x86_64.tar.gz
-          tar -xvf snowsql-2.10.1-linux_x86_64.tar.gz
-          chmod +x snowsql-2.10.1-linux_x86_64/snowsql
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowflake-snowsql-1.2.27-1.x86_64.rpm
+          sudo rpm -ivh snowsql-1.2.27-1.x86_64.rpm
+          chmod +x snowsql-1.2.27-1.x86_64/snowsql
 
       - name: Set up Snowflake Config
         run: |
