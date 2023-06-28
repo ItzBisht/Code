@@ -1,41 +1,36 @@
-name: snowflake-devops-demo
+name: Deploy to Snowflake
 
-# Controls when the action will run. 
 on:
   push:
     branches:
       - main
-    paths:
-      - 'dbscripts/**'
-
-  workflow_dispatch:
 
 jobs:
-  deploy-snowflake-changes-job:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Use Python 3.8.x
-        uses: actions/setup-python@v2.2.1
-        with:
-          python-version: 3.8.x
-
-      - name: Run schemachange
-        env:
-          SF_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SF_USERNAME: ${{ secrets.SF_USERNAME }}
-          SF_ROLE: ${{ secrets.SF_ROLE }}
-          SF_WAREHOUSE: ${{ secrets.SF_WAREHOUSE }}
-          SF_DATABASE: ${{ secrets.SF_DATABASE }}
-          SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
+      - name: Set up SnowSQL
         run: |
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          python --version
-          echo "Step 1: Installing schemachange"
-          pip install schemachange
-          
-          echo "Step 2: Running schemachange"
-          schemachange -f $GITHUB_WORKSPACE/dbscripts -a $SF_ACCOUNT -u $SF_USERNAME -r $SF_ROLE -w $SF_WAREHOUSE -d $SF_DATABASE -c $SF_DATABASE.SCHEMACHANGE.CHANGE_HISTORY --create-change-history-table
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/2.10/linux_x86_64/snowsql-2.10.1-linux_x86_64.tar.gz
+          tar -xvf snowsql-2.10.1-linux_x86_64.tar.gz
+          chmod +x snowsql-2.10.1-linux_x86_64/snowsql
+
+      - name: Set up Snowflake Config
+        run: |
+          mkdir ~/.snowsql
+          echo "[connections]" >> ~/.snowsql/config
+          echo "accountname = ${SNOWFLAKE_ACCOUNT}" >> ~/.snowsql/config
+          echo "username = ${SNOWFLAKE_USER}" >> ~/.snowsql/config
+          echo "password = ${SNOWFLAKE_PASSWORD}" >> ~/.snowsql/config
+
+      - name: Deploy to Snowflake
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        run: |
+          find ./dbscripts -name '*.sql' -print0 | sort -z | xargs -0 cat | ./snowsql-2.10.1-linux_x86_64/snowsql
