@@ -24,7 +24,7 @@ jobs:
 
       - name: Deploy to Snowflake
         env:
-          SNOWFLAKE_ACCOUNT: https://rzlatkv-rf44335.snowflakecomputing.com
+          SNOWFLAKE_ACCOUNT: rzlatkv-rf44335
           SNOWFLAKE_USER: HEMADMIN
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
           SNOWFLAKE_DATABASE: DEMO_DB
