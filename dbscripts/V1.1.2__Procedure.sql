@@ -1,5 +1,3 @@
-USE SCHEMA DEMO;
-
 create or replace procedure employee_validate_json(INPUT VARCHAR)
 RETURNS VARIANT NOT NULL
 LANGUAGE JAVASCRIPT
