@@ -10,11 +10,11 @@ snowflake_schema = sys.argv[5]
 
 # Connect to Snowflake
 conn = snowflake.connector.connect(
-    account=https://rzlatkv-rf44335.snowflakecomputing.com,
-    user=HEMADMIN,
-    password=Fun@12345,
-    database=DEMO_DB,
-    schema=DEMO
+    account=snowflake_account,
+    user=snowflake_user,
+    password=snowflake_password,
+    database=snowflake_database,
+    schema=snowflake_schema
 )
 
 # Get a cursor
