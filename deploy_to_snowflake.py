@@ -1,20 +1,20 @@
 import os
 import snowflake.connector
 
-# Snowflake connection details
-account = os.getenv('https://rzlatkv-rf44335.snowflakecomputing.com')
-user = os.getenv('HEMADMIN')
-password = os.getenv('Fun@12345')
-database = os.getenv('DEMO_DB')
-schema = os.getenv('DEMO')
+# Retrieve secrets from environment variables
+snowflake_account = os.getenv('SF_ACCOUNT')
+snowflake_user = os.getenv('SF_USERNAME')
+snowflake_password = os.getenv('SF_PASSWORD')
+snowflake_database = os.getenv('SF_DATABASE')
+snowflake_schema = os.getenv('SF_SCHEMA')
 
 # Connect to Snowflake
 conn = snowflake.connector.connect(
-    account=account,
-    user=user,
-    password=password,
-    database=database,
-    schema=schema
+    account=snowflake_account,
+    user=snowflake_user,
+    password=snowflake_password,
+    database=snowflake_database,
+    schema=snowflake_schema
 )
 
 # Get a cursor
