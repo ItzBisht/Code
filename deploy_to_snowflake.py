@@ -21,15 +21,21 @@ conn = snowflake.connector.connect(
 # Get a cursor
 cursor = conn.cursor()
 
-# Deploy SQL scripts
-for root, dirs, files in os.walk('./dbscripts'):
-    for file in files:
-        if file.endswith('.sql'):
-            script_path = os.path.join(root, file)
-            print(f'Executing SQL file: {script_path}')
-            with open(script_path, 'r') as script_file:
-                sql_script = script_file.read()
-                cursor.execute(sql_script)
+# Define the path to the directory containing SQL scripts
+scripts_dir = "./dbscripts"
 
-# Close the connection
+# Traverse the directory and execute SQL scripts
+for root, dirs, files in os.walk(scripts_dir):
+    for file in files:
+        if file.endswith(".sql"):
+            sql_file = os.path.join(root, file)
+            print(f"Executing SQL file: {sql_file}")
+            with open(sql_file, "r") as f:
+                sql_statements = f.read().split(";")
+                for statement in sql_statements:
+                    if statement.strip():
+                        cursor.execute(statement)
+
+# Close the cursor and connection
+cursor.close()
 conn.close()
