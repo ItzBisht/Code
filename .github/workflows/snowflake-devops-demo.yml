@@ -25,7 +25,7 @@ jobs:
       - name: Deploy to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: ${{ secrets.SF_ACCOUNT }}
-          SNOWFLAKE_USER: ${{ secrets.SF_USER }}
+          SNOWFLAKE_USER: ${{ secrets.SF_USERNAME }}
           SNOWFLAKE_PASSWORD: ${{ secrets.SF_PASSWORD }}
           SNOWFLAKE_DATABASE: ${{ secrets.SF_DATABASE }}
           SNOWFLAKE_SCHEMA: ${{ secrets.SF_SCHEMA }}
