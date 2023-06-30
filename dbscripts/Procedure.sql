@@ -1,6 +1,6 @@
 USE SCHEMA DEMO;
 
-create or replace procedure employee_validate_json(INPUT VARCHAR)
+'create or replace procedure employee_validate_json(INPUT VARCHAR)
 RETURNS VARIANT NOT NULL
 LANGUAGE JAVASCRIPT
 AS
@@ -36,4 +36,4 @@ json_row["is_error"] = error_count;
     json_row["is_error"] = 1;
 }
 return json_row;
-$$;
+$$;'
